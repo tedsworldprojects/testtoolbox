@@ -1,5 +1,5 @@
 {
-  "name": "TEDS TOOLBOX - final",
-  "description": "A web application for electronics engineers featuring a resistor color code decoder, Ohm's law calculator, and standard capacitor value lookup. Includes a feature to save recent calculations locally.",
+  "name": "TEDS WORLD PROJECTS",
+  "description": "A comprehensive web application for electronics engineers, featuring a Resistor Color Code Decoder, an Ohm's Law Calculator, and a Standard Capacitor Value Lookup tool. It includes local storage to save recent calculations.",
   "requestFramePermissions": []
 }
