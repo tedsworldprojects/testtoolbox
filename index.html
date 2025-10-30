@@ -1,433 +1,478 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
+  <head>
     <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>TEDS WORLD PROJECTS</title>
+    <title>Electronics Engineer Toolkit</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
+      body {
+        font-family: 'Inter', sans-serif;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        background: #0f172a; /* bg-slate-900 */
+        background: radial-gradient(ellipse at bottom, #1e293b 0%, #0f172a 100%);
+      }
+
+      /* Simple scrollbar styling for a more modern look */
+      ::-webkit-scrollbar {
+        width: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #0f172a; /* bg-slate-900 */
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #475569; /* bg-slate-600 */
+        border-radius: 4px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #64748b; /* bg-slate-500 */
+      }
+      
+      /* Add a subtle fade-in animation for components */
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
         }
-        /* Custom scrollbar for a more modern look */
-        ::-webkit-scrollbar {
-            width: 8px;
+        to {
+          opacity: 1;
+          transform: translateY(0);
         }
-        ::-webkit-scrollbar-track {
-            background: #18181b; /* zinc-900 */
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #52525b; /* zinc-600 */
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #71717a; /* zinc-500 */
-        }
-        .icon {
-            width: 1.25rem;
-            height: 1.25rem;
-        }
+      }
+
+      .card-fade-in {
+        animation: fadeIn 0.5s ease-out forwards;
+      }
+
+      /* Style for the calculated field in Ohm's Law calculator */
+      .calculated-field {
+          background-color: #312e81; /* bg-indigo-900 */
+          border-color: #6366f1; /* border-indigo-500 */
+          box-shadow: 0 0 8px rgba(99, 102, 241, 0.5);
+          transition: background-color 0.3s ease-in-out, border-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+      }
     </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react@18.2.0",
+    "react-dom/client": "https://esm.sh/react-dom@18.2.0/client",
+    "vite": "https://aistudiocdn.com/vite@^7.1.12",
+    "@vitejs/plugin-react": "https://aistudiocdn.com/@vitejs/plugin-react@^5.1.0",
+    "path": "https://aistudiocdn.com/path@^0.12.7",
+    "url": "https://aistudiocdn.com/url@^0.11.4"
+  }
+}
+</script>
+
 <link rel="stylesheet" href="/index.css">
 </head>
-<body class="bg-zinc-950 text-zinc-200">
-    <div class="min-h-screen bg-zinc-950 font-sans p-4 sm:p-6 lg:p-8">
-      <div class="max-w-7xl mx-auto">
-        <header class="text-center mb-12">
-          <h1 class="text-5xl sm:text-6xl font-black tracking-tighter bg-gradient-to-r from-sky-400 to-cyan-300 bg-clip-text text-transparent">
-            TEDS WORLD PROJECTS
-          </h1>
-          <p class="mt-3 text-lg text-zinc-400 max-w-2xl mx-auto">
-            A suite of essential, modern tools for electronics engineers and hobbyists.
-          </p>
-        </header>
+  <body class="bg-slate-900 text-slate-200">
+    <div id="root"></div>
+    <script type="module">
+      import React, { useState, useEffect } from 'react';
+      import ReactDOM from 'react-dom/client';
 
-        <main class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <!-- Resistor Decoder Card -->
-            <div class="bg-zinc-900/50 backdrop-blur-sm border border-zinc-800 rounded-2xl shadow-2xl shadow-black/20 p-6 flex flex-col">
-                <h2 class="text-2xl font-bold text-cyan-400 mb-4 tracking-tight">Resistor Color Code</h2>
-                <div class="flex flex-col h-full">
-                    <p class="text-zinc-400 mb-4 text-sm">Enter 4 or 5 comma-separated color names.</p>
-                    <input type="text" id="resistor-bands-input" value="brown, black, orange, gold" placeholder="e.g., brown, black, orange, gold" class="w-full bg-zinc-800/50 border border-zinc-700 rounded-lg px-3 py-2 text-zinc-200 focus:ring-2 focus:ring-cyan-500 focus:outline-none transition-shadow" />
-                    <button id="decode-resistor-btn" class="mt-4 w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-bold py-2 px-4 rounded-lg transition-all duration-300 transform hover:scale-105">Decode</button>
-                    <div id="resistor-result-wrapper" class="mt-4 bg-zinc-950/70 rounded-xl p-4 flex-grow min-h-[100px] flex items-center justify-center relative">
-                        <p class="text-zinc-600">Result will appear here</p>
-                    </div>
-                </div>
-            </div>
+      // --- BUNDLED CODE START ---
 
-            <!-- Ohm's Law Calculator Card -->
-            <div class="bg-zinc-900/50 backdrop-blur-sm border border-zinc-800 rounded-2xl shadow-2xl shadow-black/20 p-6 flex flex-col">
-                <h2 class="text-2xl font-bold text-cyan-400 mb-4 tracking-tight">Ohm's Law Calculator</h2>
-                <div class="flex flex-col h-full">
-                    <div class="space-y-4">
-                        <div class="relative">
-                            <label class="block text-sm font-medium text-zinc-400 mb-1">Voltage</label>
-                            <input type="number" id="ohms-voltage" placeholder="?" class="w-full bg-zinc-800/50 border border-zinc-700 rounded-lg pl-3 pr-10 py-2 text-zinc-200 focus:ring-2 focus:ring-cyan-500 focus:outline-none transition-shadow" />
-                            <span class="absolute inset-y-0 right-0 top-6 flex items-center pr-3 text-zinc-500">V</span>
-                        </div>
-                        <div class="relative">
-                            <label class="block text-sm font-medium text-zinc-400 mb-1">Current</label>
-                            <input type="number" id="ohms-current" placeholder="?" class="w-full bg-zinc-800/50 border border-zinc-700 rounded-lg pl-3 pr-10 py-2 text-zinc-200 focus:ring-2 focus:ring-cyan-500 focus:outline-none transition-shadow" />
-                            <span class="absolute inset-y-0 right-0 top-6 flex items-center pr-3 text-zinc-500">A</span>
-                        </div>
-                        <div class="relative">
-                            <label class="block text-sm font-medium text-zinc-400 mb-1">Resistance</label>
-                            <input type="number" id="ohms-resistance" placeholder="?" class="w-full bg-zinc-800/50 border border-zinc-700 rounded-lg pl-3 pr-10 py-2 text-zinc-200 focus:ring-2 focus:ring-cyan-500 focus:outline-none transition-shadow" />
-                            <span class="absolute inset-y-0 right-0 top-6 flex items-center pr-3 text-zinc-500">Ω</span>
-                        </div>
-                    </div>
-                    <div class="flex space-x-2 mt-4">
-                        <button id="calculate-ohms-btn" class="flex-grow bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-bold py-2 px-4 rounded-lg transition-all duration-300 transform hover:scale-105">Calculate</button>
-                        <button id="clear-ohms-btn" class="bg-zinc-700 hover:bg-zinc-600 text-white font-bold py-2 px-4 rounded-lg transition-colors">Clear</button>
-                    </div>
-                    <div id="ohms-result-wrapper" class="mt-4 bg-zinc-950/70 rounded-xl p-4 flex-grow min-h-[100px] flex items-center justify-center relative">
-                        <p class="text-zinc-600">Result will appear here</p>
-                    </div>
-                </div>
-            </div>
+      // constants.ts
+      const RESISTOR_COLOR_CODES = {
+        black:  { value: 0, multiplier: 1 },
+        brown:  { value: 1, multiplier: 10, tolerance: 1 },
+        red:    { value: 2, multiplier: 100, tolerance: 2 },
+        orange: { value: 3, multiplier: 1000 },
+        yellow: { value: 4, multiplier: 10000 },
+        green:  { value: 5, multiplier: 100000, tolerance: 0.5 },
+        blue:   { value: 6, multiplier: 1000000, tolerance: 0.25 },
+        violet: { value: 7, multiplier: 10000000, tolerance: 0.1 },
+        grey:   { value: 8, multiplier: 100000000, tolerance: 0.05 },
+        white:  { value: 9, multiplier: 1000000000 },
+        gold:   { value: -1, multiplier: 0.1, tolerance: 5 },
+        silver: { value: -2, multiplier: 0.01, tolerance: 10 },
+        none:   { value: -1, multiplier: 1, tolerance: 20 },
+      };
+      const E12_SERIES = [10, 12, 15, 18, 22, 27, 33, 39, 47, 56, 68, 82];
+      const E24_SERIES = [10, 11, 12, 13, 15, 16, 18, 20, 22, 24, 27, 30, 33, 36, 39, 43, 47, 51, 56, 62, 68, 75, 82, 91];
 
-            <!-- Capacitor Lookup Card -->
-            <div class="bg-zinc-900/50 backdrop-blur-sm border border-zinc-800 rounded-2xl shadow-2xl shadow-black/20 p-6 flex flex-col">
-                <h2 class="text-2xl font-bold text-cyan-400 mb-4 tracking-tight">Capacitor Value Lookup</h2>
-                <div class="flex flex-col h-full">
-                    <p class="text-zinc-400 mb-4 text-sm">Find the closest standard E12/E24 capacitor value.</p>
-                    <input type="text" id="capacitor-value-input" value="0.1uF" placeholder="e.g., 4.7nF" class="w-full bg-zinc-800/50 border border-zinc-700 rounded-lg px-3 py-2 text-zinc-200 focus:ring-2 focus:ring-cyan-500 focus:outline-none transition-shadow" />
-                    <button id="find-capacitor-btn" class="mt-4 w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-bold py-2 px-4 rounded-lg transition-all duration-300 transform hover:scale-105">Find Standard Value</button>
-                    <div id="capacitor-result-wrapper" class="mt-4 bg-zinc-950/70 rounded-xl p-4 flex-grow min-h-[100px] flex items-center justify-center relative">
-                        <p class="text-zinc-600">Result will appear here</p>
-                    </div>
-                </div>
-            </div>
-        </main>
-        
-        <section class="mt-12">
-            <div class="bg-zinc-900/50 backdrop-blur-sm border border-zinc-800 rounded-2xl shadow-2xl shadow-black/20 p-6 flex flex-col">
-                <h2 class="text-2xl font-bold text-cyan-400 mb-4 tracking-tight">Recent Calculations</h2>
-                <div id="history-content"></div>
-            </div>
-        </section>
-
-        <footer class="text-center mt-16 text-zinc-600 text-sm">
-            <p>Designed and built for the modern engineer.</p>
-            <p>&copy; 2025 TEDS WORLD PROJECTS</p>
-        </footer>
-      </div>
-    </div>
-
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-    // --- CONSTANTS ---
-    const RESISTOR_BANDS = {
-        black:  { digit: 0, multiplier: 1 },
-        brown:  { digit: 1, multiplier: 10, tolerance: 1 },
-        red:    { digit: 2, multiplier: 100, tolerance: 2 },
-        orange: { digit: 3, multiplier: 1000 },
-        yellow: { digit: 4, multiplier: 10000 },
-        green:  { digit: 5, multiplier: 100000, tolerance: 0.5 },
-        blue:   { digit: 6, multiplier: 1000000, tolerance: 0.25 },
-        violet: { digit: 7, multiplier: 10000000, tolerance: 0.1 },
-        grey:   { digit: 8, multiplier: 100000000, tolerance: 0.05 },
-        white:  { digit: 9, multiplier: 1000000000 },
-        gold:   { digit: -1, multiplier: 0.1, tolerance: 5 },
-        silver: { digit: -2, multiplier: 0.01, tolerance: 10 },
-    };
-
-    const E_SERIES = {
-        E12: [1.0, 1.2, 1.5, 1.8, 2.2, 2.7, 3.3, 3.9, 4.7, 5.6, 6.8, 8.2],
-        E24: [1.0, 1.1, 1.2, 1.3, 1.5, 1.6, 1.8, 2.0, 2.2, 2.4, 2.7, 3.0, 3.3, 3.6, 3.9, 4.3, 4.7, 5.1, 5.6, 6.2, 6.8, 7.5, 8.2, 9.1],
-    };
-
-    const ICONS = {
-        copy: `<svg xmlns="http://www.w3.org/2000/svg" class="icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>`,
-        check: `<svg xmlns="http://www.w3.org/2000/svg" class="icon text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>`,
-        save: `<svg xmlns="http://www.w3.org/2000/svg" class="icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" /></svg>`
-    };
-
-    // --- DOM ELEMENTS ---
-    const resistorBandsInput = document.getElementById('resistor-bands-input');
-    const decodeResistorBtn = document.getElementById('decode-resistor-btn');
-    const resistorResultWrapper = document.getElementById('resistor-result-wrapper');
-
-    const ohmsVoltageInput = document.getElementById('ohms-voltage');
-    const ohmsCurrentInput = document.getElementById('ohms-current');
-    const ohmsResistanceInput = document.getElementById('ohms-resistance');
-    const calculateOhmsBtn = document.getElementById('calculate-ohms-btn');
-    const clearOhmsBtn = document.getElementById('clear-ohms-btn');
-    const ohmsResultWrapper = document.getElementById('ohms-result-wrapper');
-
-    const capacitorValueInput = document.getElementById('capacitor-value-input');
-    const findCapacitorBtn = document.getElementById('find-capacitor-btn');
-    const capacitorResultWrapper = document.getElementById('capacitor-result-wrapper');
-    
-    const historyContent = document.getElementById('history-content');
-
-    // --- HISTORY MANAGEMENT ---
-    let history = [];
-
-    const loadHistory = () => {
-        try {
-            const storedHistory = localStorage.getItem('calcHistory');
-            history = storedHistory ? JSON.parse(storedHistory) : [];
-        } catch (e) {
-            console.error("Could not load history:", e);
-            history = [];
+      // utils/electronicsCalculations.ts
+      const formatResistance = (ohms) => {
+        if (ohms >= 1_000_000_000) return `${(ohms / 1_000_000_000).toPrecision(3)} GΩ`;
+        if (ohms >= 1_000_000) return `${(ohms / 1_000_000).toPrecision(3)} MΩ`;
+        if (ohms >= 1_000) return `${(ohms / 1_000).toPrecision(3)} kΩ`;
+        return `${ohms.toPrecision(3)} Ω`;
+      };
+      const decodeResistor = (colors) => {
+        const colorArray = colors.toLowerCase().split(/[\s,]+/).filter(c => c);
+        const numBands = colorArray.length;
+        if (numBands < 4 || numBands > 5) {
+          return 'Invalid number of bands. Please provide 4 or 5 colors.';
         }
-    };
-    
-    const saveHistory = () => {
-        localStorage.setItem('calcHistory', JSON.stringify(history));
-    };
-
-    const addToHistory = (tool, input, output) => {
-        const newCalculation = {
-            id: crypto.randomUUID(),
-            tool,
-            input,
-            output,
-            timestamp: Date.now(),
-        };
-        history.unshift(newCalculation);
-        history = history.slice(0, 5);
-        saveHistory();
-        renderHistory();
-    };
-
-    const renderHistory = () => {
-        if (history.length === 0) {
-            historyContent.innerHTML = `
-                <div class="flex items-center justify-center h-full min-h-[100px]">
-                    <p class="text-zinc-600">Your saved calculations will appear here.</p>
-                </div>`;
-            return;
+        const bandCodes = colorArray.map(color => RESISTOR_COLOR_CODES[color]);
+        if (bandCodes.some(code => !code)) {
+          return 'Invalid color name found. Check your input.';
         }
-
-        const historyList = history.map(calc => `
-            <li class="bg-zinc-800/50 p-3 rounded-lg text-sm border border-zinc-700/50">
-                <p class="font-semibold text-cyan-400">${calc.tool}</p>
-                <p class="text-zinc-300 font-mono text-xs mt-1">
-                    <span class="text-zinc-500 font-sans">IN:</span> ${calc.input}
-                </p>
-                <p class="text-emerald-400 font-mono text-xs">
-                    <span class="text-zinc-500 font-sans">OUT:</span> ${calc.output}
-                </p>
-            </li>`).join('');
-        
-        historyContent.innerHTML = `
-            <ul class="space-y-3 mb-6">${historyList}</ul>
-            <button id="clear-history-btn" class="w-full bg-rose-900/50 hover:bg-rose-800/70 border border-rose-800/50 text-rose-300 font-bold py-2 px-4 rounded-lg transition-colors text-sm">
-                Clear History
-            </button>`;
-        
-        document.getElementById('clear-history-btn').addEventListener('click', () => {
-            history = [];
-            saveHistory();
-            renderHistory();
-        });
-    };
-    
-    // --- UI HELPERS ---
-    const showResult = (wrapper, content, onSave, onCopy) => {
-        wrapper.innerHTML = `
-            <div>
-                ${content}
-                <div class="absolute top-2 right-2 flex space-x-2">
-                    <button data-action="save" title="Save Calculation" class="text-zinc-400 hover:text-cyan-400 transition-colors">${ICONS.save}</button>
-                    <button data-action="copy" title="Copy to Clipboard" class="text-zinc-400 hover:text-cyan-400 transition-colors">${ICONS.copy}</button>
-                </div>
-            </div>`;
-        
-        const copyBtn = wrapper.querySelector('[data-action="copy"]');
-        wrapper.querySelector('[data-action="save"]').addEventListener('click', onSave);
-        copyBtn.addEventListener('click', () => {
-            navigator.clipboard.writeText(onCopy());
-            copyBtn.innerHTML = ICONS.check;
-            setTimeout(() => { copyBtn.innerHTML = ICONS.copy; }, 2000);
-        });
-    };
-
-    const showError = (wrapper, message) => {
-        wrapper.innerHTML = `<p class="text-md text-rose-400 text-center">${message}</p>`;
-    };
-    
-    const showPlaceholder = (wrapper, message) => {
-         wrapper.innerHTML = `<p class="text-zinc-600">${message}</p>`;
-    };
-
-    // --- RESISTOR DECODER LOGIC ---
-    const formatResistance = (value) => {
-        if (value >= 1_000_000_000) return `${(value / 1_000_000_000).toPrecision(3)} GΩ`;
-        if (value >= 1_000_000) return `${(value / 1_000_000).toPrecision(3)} MΩ`;
-        if (value >= 1_000) return `${(value / 1_000).toPrecision(3)} kΩ`;
-        return `${value.toPrecision(3)} Ω`;
-    };
-    
-    decodeResistorBtn.addEventListener('click', () => {
-        const bands = resistorBandsInput.value;
-        const colorArray = bands.toLowerCase().split(',').map(c => c.trim().replace('gray', 'grey'));
-        
-        if (colorArray.length < 4 || colorArray.length > 5) {
-            showError(resistorResultWrapper, 'Please enter 4 or 5 color bands.');
-            return;
+        let resistance;
+        let tolerance;
+        if (numBands === 4) {
+          const [b1, b2, b3, b4] = bandCodes;
+          if (b1.value < 0 || b2.value < 0) return "Invalid digit color in first bands."
+          resistance = (b1.value * 10 + b2.value) * b3.multiplier;
+          tolerance = b4.tolerance;
+        } else {
+          const [b1, b2, b3, b4, b5] = bandCodes;
+          if (b1.value < 0 || b2.value < 0 || b3.value < 0) return "Invalid digit color in first bands."
+          resistance = (b1.value * 100 + b2.value * 10 + b3.value) * b4.multiplier;
+          tolerance = b5.tolerance;
         }
-
-        const bandValues = colorArray.map(color => RESISTOR_BANDS[color]);
-        if (bandValues.some(v => v === undefined)) {
-            showError(resistorResultWrapper, 'Invalid color name detected. Check for typos.');
-            return;
+        if (tolerance === undefined) {
+          return `Resistance: ${formatResistance(resistance)}. Tolerance not specified.`;
         }
-    
-        try {
-            let valueStr = '', multiplier, tolerance;
-
-            if (colorArray.length === 4) { // 4-band
-                valueStr = `${bandValues[0].digit}${bandValues[1].digit}`;
-                multiplier = bandValues[2].multiplier;
-                tolerance = bandValues[3].tolerance;
-            } else { // 5-band
-                valueStr = `${bandValues[0].digit}${bandValues[1].digit}${bandValues[2].digit}`;
-                multiplier = bandValues[3].multiplier;
-                tolerance = bandValues[4].tolerance;
-            }
-          
-            if (tolerance === undefined) {
-                showError(resistorResultWrapper, 'The last band is not a valid tolerance color.');
-                return;
-            }
-
-            const resistanceValue = parseInt(valueStr, 10) * multiplier;
-            const formattedValue = formatResistance(resistanceValue);
-            const finalResult = `Resistance: ${formattedValue} ±${tolerance}%`;
-            
-            showResult(
-                resistorResultWrapper,
-                `<p class="text-lg text-emerald-400 font-mono text-center">${finalResult}</p>`,
-                () => addToHistory('Resistor', bands, finalResult),
-                () => finalResult
-            );
-        } catch (e) {
-            showError(resistorResultWrapper, 'Could not calculate. Please check bands.');
-        }
-    });
-
-    // --- OHM'S LAW LOGIC ---
-    calculateOhmsBtn.addEventListener('click', () => {
-        const V = parseFloat(ohmsVoltageInput.value);
-        const I = parseFloat(ohmsCurrentInput.value);
-        const R = parseFloat(ohmsResistanceInput.value);
-        
-        const filledInputs = [!isNaN(V), !isNaN(I), !isNaN(R)].filter(Boolean).length;
-        if (filledInputs !== 2) {
-            showError(ohmsResultWrapper, 'Please provide exactly two values.');
-            return;
-        }
-
-        let calculatedResult = '', inputString = '';
-        
-        if (isNaN(V)) {
-            const newV = I * R;
-            ohmsVoltageInput.value = newV.toPrecision(4);
-            calculatedResult = `Voltage (V) = ${newV.toPrecision(4)} V`;
-            inputString = `I=${I} A, R=${R} Ω`;
-        } else if (isNaN(I)) {
-            if (R === 0) { showError(ohmsResultWrapper, "Resistance cannot be zero."); return; }
-            const newI = V / R;
-            ohmsCurrentInput.value = newI.toPrecision(4);
-            calculatedResult = `Current (I) = ${newI.toPrecision(4)} A`;
-            inputString = `V=${V} V, R=${R} Ω`;
-        } else if (isNaN(R)) {
-            if (I === 0) { showError(ohmsResultWrapper, "Current cannot be zero."); return; }
-            const newR = V / I;
-            ohmsResistanceInput.value = newR.toPrecision(4);
-            calculatedResult = `Resistance (R) = ${newR.toPrecision(4)} Ω`;
-            inputString = `V=${V} V, I=${I} A`;
-        }
-        
-        showResult(
-            ohmsResultWrapper,
-            `<p class="text-lg text-emerald-400 font-mono text-center">${calculatedResult}</p>`,
-            () => addToHistory("Ohm's Law", inputString, calculatedResult),
-            () => calculatedResult
-        );
-    });
-
-    clearOhmsBtn.addEventListener('click', () => {
-        ohmsVoltageInput.value = '';
-        ohmsCurrentInput.value = '';
-        ohmsResistanceInput.value = '';
-        showPlaceholder(ohmsResultWrapper, 'Result will appear here');
-    });
-
-    // --- CAPACITOR LOOKUP LOGIC ---
-    const parseCapacitance = (input) => {
-        const match = input.toLowerCase().match(/(\d*\.?\d+)\s*(p|n|u|µ)?f?/);
+        return `Resistance: ${formatResistance(resistance)} ±${tolerance}%`;
+      };
+      const parseCapacitance = (value) => {
+        const match = value.toLowerCase().match(/^(\d*\.?\d+)\s*(p|n|u|µ)f?$/);
         if (!match) return null;
-        const value = parseFloat(match[1]);
+        const num = parseFloat(match[1]);
         const unit = match[2];
         switch (unit) {
-            case 'p': return value;
-            case 'n': return value * 1e3;
-            case 'u': case 'µ': return value * 1e6;
-            default: return value;
+          case 'p': return num;
+          case 'n': return num * 1000;
+          case 'u':
+          case 'µ': return num * 1000000;
+          default: return null;
         }
-    };
+      };
+      const findClosest = (target, series) => {
+          let closestVal = series[0];
+          let minDiff = Infinity;
+          for (const val of series) {
+              const diff = Math.abs(Math.log10(target) - Math.log10(val));
+              if (diff < minDiff) {
+                  minDiff = diff;
+                  closestVal = val;
+              }
+          }
+          return closestVal;
+      }
+      const formatCapacitance = (pF) => {
+          if (pF < 1000) return `${pF}pF`;
+          if (pF < 1000000) return `${pF / 1000}nF`;
+          return `${pF / 1000000}µF`;
+      }
+      const findStandardCapacitorValue = (inputValue) => {
+          const valueInPf = parseCapacitance(inputValue);
+          if (valueInPf === null) {
+              return "Invalid input. Use format like '0.1uF', '10nF', '100pF'.";
+          }
+          if (valueInPf === 0) return "Input value cannot be zero.";
+          const magnitude = Math.pow(10, Math.floor(Math.log10(valueInPf)));
+          const normalizedTarget = valueInPf / magnitude * 10;
+          const closestE12Base = findClosest(normalizedTarget, E12_SERIES);
+          const closestE24Base = findClosest(normalizedTarget, E24_SERIES);
+          const closestE12 = closestE12Base * magnitude / 10;
+          const closestE24 = closestE24Base * magnitude / 10;
+          return `Closest E12: ${formatCapacitance(closestE12)}\nClosest E24: ${formatCapacitance(closestE24)}`;
+      };
 
-    const formatCapacitance = (value) => {
-        if (value >= 1e6) return `${(value / 1e6).toPrecision(3)} µF`;
-        if (value >= 1e3) return `${(value / 1e3).toPrecision(3)} nF`;
-        return `${value.toPrecision(3)} pF`;
-    };
-    
-    findCapacitorBtn.addEventListener('click', () => {
-        const value = capacitorValueInput.value;
-        const valInPF = parseCapacitance(value);
-        
-        if (valInPF === null || isNaN(valInPF)) {
-            showError(capacitorResultWrapper, 'Invalid format. Use 100pF, 22nF, 0.1uF.');
-            return;
-        }
-        
-        let magnitude = Math.pow(10, Math.floor(Math.log10(valInPF)));
-        let normalizedTarget = valInPF / magnitude;
+      // hooks/useLocalStorage.ts
+      function useLocalStorage(key, initialValue) {
+        const [storedValue, setStoredValue] = useState(() => {
+          if (typeof window === 'undefined') {
+            return initialValue;
+          }
+          try {
+            const item = window.localStorage.getItem(key);
+            return item ? JSON.parse(item) : initialValue;
+          } catch (error) {
+            console.error(error);
+            return initialValue;
+          }
+        });
+        useEffect(() => {
+          try {
+            if (typeof window !== 'undefined') {
+              const valueToStore = JSON.stringify(storedValue);
+              window.localStorage.setItem(key, valueToStore);
+            }
+          } catch (error) {
+            console.error(error);
+          }
+        }, [key, storedValue]);
+        return [storedValue, setStoredValue];
+      }
 
-        const find = (series) => {
-            const closestBase = series.reduce((prev, curr) => (Math.abs(curr - normalizedTarget) < Math.abs(prev - normalizedTarget) ? curr : prev));
-            return closestBase * magnitude;
-        };
-        
-        const closestE12 = find(E_SERIES.E12);
-        const closestE24 = find(E_SERIES.E24);
-        
-        const result = {
-            e12: formatCapacitance(closestE12),
-            e24: formatCapacitance(closestE24)
-        };
-        const resultString = `E12: ${result.e12}, E24: ${result.e24}`;
-        
-        const content = `
-            <div class="text-center">
-              <p class="text-zinc-400 text-sm">Closest E12 Value:</p>
-              <p class="text-lg text-emerald-400 font-mono mb-2">${result.e12}</p>
-              <p class="text-zinc-400 text-sm">Closest E24 Value:</p>
-              <p class="text-lg text-emerald-400 font-mono">${result.e24}</p>
-            </div>`;
-
-        showResult(
-            capacitorResultWrapper,
-            content,
-            () => addToHistory('Capacitor', value, resultString),
-            () => resultString
+      // components/Card.tsx
+      const Card = ({ title, icon, children }) => {
+        return React.createElement('div', { className: "bg-slate-800/50 border border-slate-700 rounded-2xl shadow-lg flex flex-col backdrop-blur-sm hover:border-slate-600 transition-all duration-300" },
+          React.createElement('div', { className: "p-5 border-b border-slate-700 flex items-center space-x-3" },
+            React.createElement('div', { className: "text-indigo-400" }, icon),
+            React.createElement('h2', { className: "text-xl font-semibold text-slate-100" }, title)
+          ),
+          React.createElement('div', { className: "p-5 flex-grow" }, children)
         );
-    });
+      };
 
-    // --- INITIALIZATION ---
-    loadHistory();
-    renderHistory();
-});
-</script>
-<script type="module" src="/index.tsx"></script>
+      // components/ResultDisplay.tsx
+      const ClipboardIcon = ({ isCopied }) => {
+        return isCopied ?
+          React.createElement('svg', { xmlns: "http://www.w3.org/2000/svg", className: "h-5 w-5 text-green-400", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" },
+            React.createElement('path', { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 2, d: "M5 13l4 4L19 7" })
+          ) :
+          React.createElement('svg', { xmlns: "http://www.w3.org/2000/svg", className: "h-5 w-5", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" },
+            React.createElement('path', { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 2, d: "M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" })
+          );
+      };
+      const ResultDisplay = ({ result }) => {
+        const [isCopied, setIsCopied] = useState(false);
+        const handleCopy = () => {
+          if (!result) return;
+          navigator.clipboard.writeText(result);
+          setIsCopied(true);
+          setTimeout(() => setIsCopied(false), 2000);
+        };
+        return React.createElement('div', { className: "mt-4" },
+          React.createElement('label', { className: "block text-sm font-medium text-slate-400 mb-1" }, "Result"),
+          React.createElement('div', { className: "relative bg-slate-900/75 border border-slate-700 rounded-lg p-3 min-h-[6rem]" },
+            React.createElement('pre', { className: "text-green-400 whitespace-pre-wrap text-sm leading-relaxed" }, result),
+            result && React.createElement('div', { className: "absolute top-2 right-2 flex space-x-2" },
+              React.createElement('button', {
+                  onClick: handleCopy,
+                  className: "p-1.5 text-slate-400 hover:text-white bg-slate-700/50 hover:bg-slate-700 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500",
+                  title: isCopied ? "Copied!" : "Copy to Clipboard"
+                },
+                React.createElement(ClipboardIcon, { isCopied: isCopied })
+              )
+            )
+          )
+        );
+      };
+
+      // components/ResistorDecoder.tsx
+      const ResistorIcon = () => React.createElement('svg', { xmlns: "http://www.w3.org/2000/svg", className: "h-6 w-6", fill: "none", viewBox: "0 0 24 24", strokeWidth: "1.5", stroke: "currentColor" },
+          React.createElement('path', { strokeLinecap: "round", strokeLinejoin: "round", d: "M3 12h3l1.5-4 3 8 3-8 1.5 4h5" })
+      );
+      const ResistorDecoder = ({ onSave }) => {
+        const [colors, setColors] = useState('brown, black, orange, gold');
+        const [result, setResult] = useState('');
+        const handleDecode = () => {
+          const decodedValue = decodeResistor(colors);
+          setResult(decodedValue);
+          if (decodedValue.startsWith('Resistance:')) {
+            onSave('Resistor Decoder', colors, decodedValue);
+          }
+        };
+        return React.createElement(Card, { title: "Resistor Color Code Decoder", icon: React.createElement(ResistorIcon, null) },
+          React.createElement('div', null,
+            React.createElement('div', null,
+              React.createElement('label', { htmlFor: "resistor-colors", className: "block text-sm font-medium text-slate-400" }, "4 or 5 Band Colors"),
+              React.createElement('input', { id: "resistor-colors", type: "text", value: colors, onChange: (e) => setColors(e.target.value), placeholder: "e.g., red, red, orange, gold", className: "mt-1 block w-full bg-slate-700/50 border-slate-600 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-slate-100" }),
+              React.createElement('p', { className: "mt-2 text-xs text-slate-500" }, "Separate colors with a comma or space.")
+            ),
+            React.createElement('button', { onClick: handleDecode, className: "mt-4 w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-bold py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-900 focus:ring-blue-500 transition-all duration-150" }, "Decode"),
+            React.createElement('div', null, React.createElement(ResultDisplay, { result: result }))
+          )
+        );
+      };
+
+      // components/OhmsLawCalculator.tsx
+      const OhmsLawIcon = () => React.createElement('svg', { xmlns: "http://www.w3.org/2000/svg", className: "h-6 w-6", fill: "none", viewBox: "0 0 24 24", strokeWidth: "1.5", stroke: "currentColor" },
+          React.createElement('path', { strokeLinecap: "round", strokeLinejoin: "round", d: "M4 19h5v-1a7 7 0 1 1 6 0v1h5" })
+      );
+      const OhmsLawCalculator = ({ onSave }) => {
+        const [voltage, setVoltage] = useState('');
+        const [current, setCurrent] = useState('');
+        const [resistance, setResistance] = useState('');
+        const [result, setResult] = useState('');
+        const [error, setError] = useState('');
+        const [lastCalculated, setLastCalculated] = useState('');
+        const calculate = () => {
+          setError('');
+          setResult('');
+          const v = parseFloat(voltage);
+          const i = parseFloat(current);
+          const r = parseFloat(resistance);
+          const filledFields = [voltage, current, resistance].filter(Boolean).length;
+          if (filledFields !== 2) {
+            setError('Please provide exactly two values.');
+            return;
+          }
+          let resultString = '';
+          let inputString = '';
+          if (!voltage) {
+            const newV = i * r;
+            setVoltage(newV.toPrecision(4));
+            setLastCalculated('voltage');
+            resultString = `Voltage (V) = ${newV.toPrecision(4)} V`;
+            inputString = `I=${current}A, R=${resistance}Ω`;
+          } else if (!current) {
+            if (r === 0) {
+              setError("Resistance cannot be zero for this calculation.");
+              return;
+            }
+            const newI = v / r;
+            setCurrent(newI.toPrecision(4));
+            setLastCalculated('current');
+            resultString = `Current (I) = ${newI.toPrecision(4)} A`;
+            inputString = `V=${voltage}V, R=${resistance}Ω`;
+          } else if (!resistance) {
+            if (i === 0) {
+              setError("Current cannot be zero for this calculation.");
+              return;
+            }
+            const newR = v / i;
+            setResistance(newR.toPrecision(4));
+            setLastCalculated('resistance');
+            resultString = `Resistance (R) = ${newR.toPrecision(4)} Ω`;
+            inputString = `V=${voltage}V, I=${current}A`;
+          }
+          setResult(resultString);
+          onSave("Ohm's Law", inputString, resultString);
+        };
+        const handleInputChange = (setter) => (e) => {
+          setter(e.target.value);
+          setLastCalculated('');
+        }
+        const clearFields = () => {
+          setVoltage('');
+          setCurrent('');
+          setResistance('');
+          setResult('');
+          setError('');
+          setLastCalculated('');
+        };
+        return React.createElement(Card, { title: "Ohm's Law Calculator", icon: React.createElement(OhmsLawIcon, null) },
+          React.createElement('div', { className: "space-y-3" },
+            React.createElement('div', null,
+              React.createElement('label', { htmlFor: "voltage", className: "block text-sm font-medium text-slate-400" }, "Voltage (V)"),
+              React.createElement('input', { id: "voltage", type: "number", value: voltage, onChange: handleInputChange(setVoltage), placeholder: "e.g., 5", className: `mt-1 block w-full bg-slate-700/50 border-slate-600 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-slate-100 ${lastCalculated === 'voltage' ? 'calculated-field' : ''}` })
+            ),
+            React.createElement('div', null,
+              React.createElement('label', { htmlFor: "current", className: "block text-sm font-medium text-slate-400" }, "Current (I) in Amperes"),
+              React.createElement('input', { id: "current", type: "number", value: current, onChange: handleInputChange(setCurrent), placeholder: "e.g., 0.02", className: `mt-1 block w-full bg-slate-700/50 border-slate-600 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-slate-100 ${lastCalculated === 'current' ? 'calculated-field' : ''}` })
+            ),
+            React.createElement('div', null,
+              React.createElement('label', { htmlFor: "resistance", className: "block text-sm font-medium text-slate-400" }, "Resistance (R) in Ohms"),
+              React.createElement('input', { id: "resistance", type: "number", value: resistance, onChange: handleInputChange(setResistance), placeholder: "e.g., 1000", className: `mt-1 block w-full bg-slate-700/50 border-slate-600 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-slate-100 ${lastCalculated === 'resistance' ? 'calculated-field' : ''}` })
+            ),
+            React.createElement('div', { className: "flex space-x-2 pt-2" },
+              React.createElement('button', { onClick: calculate, className: "w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-bold py-2 px-4 rounded-md transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-900 focus:ring-blue-500" }, "Calculate"),
+              React.createElement('button', { onClick: clearFields, className: "w-full bg-slate-600 hover:bg-slate-700 text-white font-bold py-2 px-4 rounded-md transition duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-900 focus:ring-slate-500" }, "Clear")
+            ),
+            error && React.createElement('p', { className: "text-red-400 text-sm mt-2" }, error),
+            result && React.createElement(ResultDisplay, { result: result })
+          )
+        );
+      };
+
+      // components/CapacitorLookup.tsx
+      const CapacitorIcon = () => React.createElement('svg', { xmlns: "http://www.w3.org/2000/svg", className: "h-6 w-6", fill: "none", viewBox: "0 0 24 24", strokeWidth: "1.5", stroke: "currentColor" },
+          React.createElement('path', { strokeLinecap: "round", strokeLinejoin: "round", d: "M3 12h6m4 0h6" }),
+          React.createElement('path', { strokeLinecap: "round", strokeLinejoin: "round", d: "M9 5v14" }),
+          React.createElement('path', { strokeLinecap: "round", strokeLinejoin: "round", d: "M13 5v14" })
+      );
+      const CapacitorLookup = ({ onSave }) => {
+        const [value, setValue] = useState('0.1uF');
+        const [result, setResult] = useState('');
+        const handleLookup = () => {
+          const lookupResult = findStandardCapacitorValue(value);
+          setResult(lookupResult);
+          if (lookupResult.startsWith('Closest E12:')) {
+            onSave('Capacitor Lookup', value, lookupResult);
+          }
+        };
+        return React.createElement(Card, { title: "Standard Capacitor Value Lookup", icon: React.createElement(CapacitorIcon, null) },
+          React.createElement('div', null,
+            React.createElement('div', null,
+              React.createElement('label', { htmlFor: "capacitor-value", className: "block text-sm font-medium text-slate-400" }, "Capacitance Value"),
+              React.createElement('input', { id: "capacitor-value", type: "text", value: value, onChange: (e) => setValue(e.target.value), placeholder: "e.g., 4.7nF, 100pF", className: "mt-1 block w-full bg-slate-700/50 border-slate-600 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-slate-100" }),
+              React.createElement('p', { className: "mt-2 text-xs text-slate-500" }, "Units: pF, nF, uF (or µF).")
+            ),
+            React.createElement('button', { onClick: handleLookup, className: "mt-4 w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-bold py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-900 focus:ring-blue-500 transition-all duration-150" }, "Find Closest Value"),
+            React.createElement('div', null, React.createElement(ResultDisplay, { result: result }))
+          )
+        );
+      };
+
+      // components/History.tsx
+      const HistoryIcon = () => React.createElement('svg', { xmlns: "http://www.w3.org/2000/svg", className: "h-6 w-6", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" },
+        React.createElement('path', { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 2, d: "M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" })
+      );
+      const History = ({ history, onClear }) => {
+        return React.createElement(Card, { title: "Calculation History", icon: React.createElement(HistoryIcon, null) },
+          React.createElement('div', null,
+            history.length > 0 && React.createElement('button', { onClick: onClear, className: "mb-4 w-full text-sm bg-red-900/70 hover:bg-red-800/70 border border-red-800/90 text-white font-bold py-1.5 px-3 rounded-md transition duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-900 focus:ring-red-500" }, "Clear History"),
+            React.createElement('div', { className: "space-y-4" },
+              history.length > 0 ?
+              history.map((item) => React.createElement('div', { key: item.id, className: "bg-slate-700/30 p-3 rounded-lg border border-slate-700/50" },
+                  React.createElement('p', { className: "font-semibold text-indigo-400 text-sm" }, item.tool),
+                  React.createElement('p', { className: "text-xs text-slate-400 mt-1" }, "Input: ", React.createElement('span', { className: "text-slate-300" }, item.input)),
+                  React.createElement('p', { className: "text-xs text-slate-400 mt-1" }, "Result: ", React.createElement('span', { className: "text-slate-200 whitespace-pre-wrap" }, item.result))
+              )) :
+              React.createElement('div', { className: "flex items-center justify-center h-24 text-center text-slate-500" },
+                React.createElement('p', null, "Your last 5 saved calculations will appear here.")
+              )
+            )
+          )
+        );
+      };
+
+      // App.tsx
+      const App = () => {
+        const [history, setHistory] = useLocalStorage('calcHistory', []);
+        const handleSaveCalculation = (tool, input, result) => {
+          const newHistoryEntry = {
+            id: Date.now(),
+            tool,
+            input,
+            result,
+          };
+          setHistory(prevHistory => [newHistoryEntry, ...prevHistory].slice(0, 5));
+        };
+        const clearHistory = () => {
+          setHistory([]);
+        };
+        return React.createElement('div', { className: "min-h-screen font-sans p-6 sm:p-8 lg:p-12" },
+          React.createElement('div', { className: "max-w-6xl mx-auto" },
+            React.createElement('header', { className: "text-center mb-10" },
+              React.createElement('h1', { 
+                  className: "text-4xl sm:text-5xl font-bold bg-gradient-to-r from-purple-500 to-fuchsia-500 bg-clip-text text-transparent tracking-tight",
+                  style: { textShadow: '0 0 12px rgba(255, 255, 255, 0.4)' }
+              }, "TEDS WORLD PROJECTS"),
+              React.createElement('p', { className: "mt-2 text-lg text-slate-400" }, "Your essential suite of bench tools!")
+            ),
+            React.createElement('main', { className: "grid grid-cols-1 lg:grid-cols-2 gap-8" },
+              React.createElement('div', { className: "card-fade-in", style: { animationDelay: '100ms' } }, React.createElement(ResistorDecoder, { onSave: handleSaveCalculation })),
+              React.createElement('div', { className: "card-fade-in", style: { animationDelay: '200ms' } }, React.createElement(OhmsLawCalculator, { onSave: handleSaveCalculation })),
+              React.createElement('div', { className: "card-fade-in", style: { animationDelay: '300ms' } }, React.createElement(CapacitorLookup, { onSave: handleSaveCalculation })),
+              React.createElement('div', { className: "card-fade-in", style: { animationDelay: '400ms' } }, React.createElement(History, { history: history, onClear: clearHistory }))
+            ),
+            React.createElement('footer', { className: "text-center mt-12 text-slate-500 text-sm" },
+              React.createElement('p', null, "2025 Teds World Projects Toolbox v1.1"),
+              React.createElement('p', { className: "mt-1" },
+                React.createElement('a', {
+                  href: "https://youtube.com/@tedsworldprojects",
+                  target: "_blank",
+                  rel: "noopener noreferrer",
+                  className: "hover:text-indigo-400 transition-colors"
+                }, "youtube.com/@tedsworldprojects")
+              )
+            )
+          )
+        );
+      };
+
+      // index.tsx (render call)
+      const rootElement = document.getElementById('root');
+      const root = ReactDOM.createRoot(rootElement);
+      root.render(React.createElement(React.StrictMode, null, React.createElement(App, null)));
+
+      // --- BUNDLED CODE END ---
+    </script>
+  <script type="module" src="/index.tsx"></script>
 </body>
 </html>
